@@ -1,0 +1,9 @@
+grey = (100, 100, 100)  # undiscovered node or edge
+white = (255, 255, 255)  # discovered edge or node outline
+yellow = (200, 200, 0)  # current node fill
+red = (200, 0, 0)  # discovered node fill
+black = (0, 0, 0)  # undiscovered node fill
+blue = (30, 144, 255)  # completed node fill and completed edge
+purple = (138, 43, 226) # goal
+orange = (255,165,0) # start
+green = (54, 179, 72) # searched path
