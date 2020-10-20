@@ -1,7 +1,11 @@
+from math import dist
 from networkx.algorithms.clique import number_of_cliques
 import pygame
 import graphUI
 from node_color import white, yellow, black, red, blue, purple, orange, green
+
+import math
+import queue
 
 """
 Feel free print graph, edges to console to get more understand input.
@@ -16,7 +20,7 @@ def BFS(graph, edges, edge_id, start, goal):
     """
     # TODO: your code
     print("Implement BFS algorithm.")
-    if start not in range (0, len(graph)) or goal not in range (0, len(graph)):
+    if start not in range(0, len(graph)) or goal not in range(0, len(graph)):
         return
 
     for i in range(len(graph)):
@@ -66,7 +70,6 @@ def BFS(graph, edges, edge_id, start, goal):
                 explored.add(adjacency)
                 graph[adjacency][3] = blue
                 graphUI.updateUI()
-        
 
 
 def find_path_dfs(graph, edges, edge_id, current, goal, visited):
@@ -85,11 +88,13 @@ def find_path_dfs(graph, edges, edge_id, current, goal, visited):
             visited.add(neighbor)
             graph[neighbor][3] = blue
             graphUI.updateUI()
-            path = find_path_dfs(graph, edges, edge_id, neighbor, goal, visited)
+            path = find_path_dfs(graph, edges, edge_id,
+                                 neighbor, goal, visited)
 
             if path is not None:
                 path.insert(0, current)
                 return path
+
 
 def DFS(graph, edges, edge_id, start, goal):
     """
@@ -97,7 +102,7 @@ def DFS(graph, edges, edge_id, start, goal):
     """
     # TODO: your code
     print("Implement DFS algorithm.")
-    if start not in range (0, len(graph)) or goal not in range (0, len(graph)):
+    if start not in range(0, len(graph)) or goal not in range(0, len(graph)):
         return
 
     for i in range(len(graph)):
@@ -117,12 +122,22 @@ def DFS(graph, edges, edge_id, start, goal):
         graph[goal][3] = purple
         graphUI.updateUI()
 
-    path = find_path_dfs(graph, edges, edge_id, start, goal, explored)    
+    path = find_path_dfs(graph, edges, edge_id, start, goal, explored)
     graph[start][3] = orange
     for i in range(len(path) - 1):
         edges[edge_id(path[i], path[i + 1])][1] = green
     graph[goal][3] = purple
     graphUI.updateUI()
+
+
+def get_cost(graph, first_node, second_node):
+    # Function calculate distance between two node
+    # first_node at (x_1, y_1)
+    # second_node at (x_2, y_2)
+    # dist = sqrt((x_2 - x_1)^2 + (y_2 - y_1)^2)
+    dist = math.sqrt((graph[second_node][0][0] - graph[first_node][0][0])
+                         ** 2 + (graph[second_node][0][1] - graph[first_node][0][1])**2)
+    return dist
 
 
 def UCS(graph, edges, edge_id, start, goal):
@@ -131,18 +146,20 @@ def UCS(graph, edges, edge_id, start, goal):
     """
     # TODO: your code
     print("Implement Uniform Cost Search algorithm.")
-    if start not in range (0, len(graph)) or goal not in range (0, len(graph)):
+    if start not in range(0, len(graph)) or goal not in range(0, len(graph)):
         return
-    
+
     if start == goal:
         print("Algorithm finished - your path is: {} -> {}".format(start, goal))
         graph[start][3] = orange
         graph[goal][3] = purple
         edges[edge_id(start, goal)][1] = green
         return
-    
-    
-    pass
+
+    # keep track of explored nodes
+    explored = set()
+    q = queue.PriorityQueue()
+    print(get_cost(graph, 0, 1))
 
 
 def AStar(graph, edges, edge_id, start, goal):
@@ -182,7 +199,8 @@ def example_func(graph, edges, edge_id, start, goal):
     @param goal: int - vertices/node to search
     @return:
     """
-
+    print(graph)
+    return
     # Ex1: Set all edge from Node 1 to Adjacency node of Node 1 is green edges.
     node_1 = graph[1]
     for adjacency_node in node_1[1]:
