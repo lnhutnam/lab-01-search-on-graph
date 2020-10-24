@@ -1,11 +1,11 @@
-from math import dist
+from math import cos, dist
 from networkx.algorithms.clique import number_of_cliques
 import pygame
 import graphUI
-from node_color import white, yellow, black, red, blue, purple, orange, green
+from node_color import white, yellow, black, red, blue, purple, orange, green, grey
 
 import math
-import queue
+from queue import Queue, PriorityQueue
 
 """
 Feel free print graph, edges to console to get more understand input.
@@ -130,13 +130,13 @@ def DFS(graph, edges, edge_id, start, goal):
     graphUI.updateUI()
 
 
-def get_cost(graph, first_node, second_node):
+def get_cost(first_node, second_node):
     # Function calculate distance between two node
     # first_node at (x_1, y_1)
     # second_node at (x_2, y_2)
     # dist = sqrt((x_2 - x_1)^2 + (y_2 - y_1)^2)
-    dist = math.sqrt((graph[second_node][0][0] - graph[first_node][0][0])
-                         ** 2 + (graph[second_node][0][1] - graph[first_node][0][1])**2)
+    dist = math.sqrt((second_node[0] - first_node[0])
+                         ** 2 + (second_node[1] - first_node[1])**2)
     return dist
 
 
@@ -156,10 +156,61 @@ def UCS(graph, edges, edge_id, start, goal):
         edges[edge_id(start, goal)][1] = green
         return
 
+    print(graph)
+    for i in range(len(graph)):
+        graph[i][3] = black
+    graphUI.updateUI()
+
     # keep track of explored nodes
     explored = set()
-    q = queue.PriorityQueue()
-    print(get_cost(graph, 0, 1))
+    container = PriorityQueue()
+    predecessor_set = set()
+    # predecessor, cost, current node
+    container.put((-1, 0, start))
+
+    while container:
+        if container.empty():
+            raise Exception("No way Exception")
+            return
+        predecessor, cost, current_node = container.get()
+        if current_node not in explored:
+            graph[current_node][3] = yellow
+            graphUI.updateUI()
+            predecessor_set.add((predecessor, current_node))
+            explored.add(current_node)
+
+            if current_node == goal:
+                print(predecessor)
+                print(current_node)
+                print(cost)
+                path = [current_node]
+                print(path)
+                print(predecessor_set)
+                while True:
+                    for item in predecessor_set:
+                        if item[1] == current_node:
+                            predecessor = item[0]
+                    path.append(predecessor)
+                    current_node = predecessor
+                    if current_node == start:
+                        break
+                print(path)
+                graph[start][3] = orange
+                graph[goal][3] = purple
+                for i in range(len(path) - 1):
+                    edges[edge_id(path[i], path[i + 1])][1] = green
+                graphUI.updateUI()
+                return                 
+            for neighbor in graph[current_node][1]:
+                graph[neighbor][3] = red
+                edges[edge_id(current_node, neighbor)][1] = white
+                graphUI.updateUI()
+                total_cost = cost + get_cost(graph[current_node][0], graph[neighbor][0])
+                container.put((current_node, total_cost, neighbor))
+
+            graph[current_node][3] = blue
+            graphUI.updateUI()
+        
 
 
 def AStar(graph, edges, edge_id, start, goal):
@@ -168,6 +219,16 @@ def AStar(graph, edges, edge_id, start, goal):
     """
     # TODO: your code
     print("Implement A* algorithm.")
+    if start or goal not in range(len(graph)):
+        print("Error: ")
+        return
+        
+    if start == goal:
+        print("Algorithm finished - your path is: {} -> {}".format(start, goal))
+        graph[start][3] = orange
+        graph[goal][3] = purple
+        edges[edge_id(start, goal)][1] = green
+        return
     pass
 
 
