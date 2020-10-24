@@ -21,6 +21,7 @@ def BFS(graph, edges, edge_id, start, goal):
     # TODO: your code
     print("Implement BFS algorithm.")
     if start not in range(0, len(graph)) or goal not in range(0, len(graph)):
+        print("Error: Input invaild range.")
         return
 
     for i in range(len(graph)):
@@ -34,10 +35,6 @@ def BFS(graph, edges, edge_id, start, goal):
     queue = [[start]]
     explored.add(start)
 
-    # Set color orange for start node
-    graph[start][3] = orange
-    graphUI.updateUI()
-
     if start == goal:
         print("Algorithm finished - your path is: {} -> {}".format(start, goal))
         # Set color yellow for the goal node
@@ -47,8 +44,6 @@ def BFS(graph, edges, edge_id, start, goal):
     while queue:
         path = queue.pop(0)
         node = path[-1]
-        graph[node][3] = yellow
-        graphUI.updateUI()
         if node == goal:
             graph[start][3] = orange
             for i in range(len(path) - 1):
@@ -58,7 +53,8 @@ def BFS(graph, edges, edge_id, start, goal):
             graphUI.updateUI()
             print(path)
             return
-
+        graph[node][3] = yellow
+        graphUI.updateUI()
         for adjacency in graph[node][1]:
             edges[edge_id(node, adjacency)][1] = white
             graph[adjacency][3] = red
@@ -68,8 +64,8 @@ def BFS(graph, edges, edge_id, start, goal):
                 new_path.append(adjacency)
                 queue.append(new_path)
                 explored.add(adjacency)
-                graph[adjacency][3] = blue
-                graphUI.updateUI()
+        graph[node][3] = blue
+        graphUI.updateUI()
 
 
 def find_path_dfs(graph, edges, edge_id, current, goal, visited):
@@ -212,6 +208,9 @@ def UCS(graph, edges, edge_id, start, goal):
             graphUI.updateUI()
         
 
+def euclidean_distance(x_1, y_1, x_2, y_2):
+    distance = math.sqrt((x_2 - x_1)**2 + (y_2 - y_1)**2)
+    return distance
 
 def AStar(graph, edges, edge_id, start, goal):
     """
@@ -222,7 +221,7 @@ def AStar(graph, edges, edge_id, start, goal):
     if start or goal not in range(len(graph)):
         print("Error: ")
         return
-        
+
     if start == goal:
         print("Algorithm finished - your path is: {} -> {}".format(start, goal))
         graph[start][3] = orange
