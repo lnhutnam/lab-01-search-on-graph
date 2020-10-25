@@ -45,13 +45,6 @@ print(bfs(graph, '0', '6'))
 from queue import PriorityQueue
 
 q = PriorityQueue()
-
-q.put((4, 'Read'))
-q.put((2, 'Play'))
-q.put((5, 'Write'))
-q.put((1, 'Code'))
-q.put((3, 'Study'))
-
-while not q.empty():
-    next_item = q.get()
-    print(next_item)
+a = ((1, 1), (10,2), (1, 0))
+q.put(a)
+print(any((1, 1) in item for item in q.queue))
