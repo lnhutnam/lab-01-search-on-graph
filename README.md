@@ -18,4 +18,12 @@ Argument from command line. To run:
 For example:
 	`python main.py input.txt bfs`
 
+Run commad with example `input.txt`, you can change with another input text file in this project:
+
+Breadth-First Search: `python main.py input.txt bfs`
+Depth-First Search: `python main.py input.txt dfs`
+Uniform-cost Search: `python main.py input.txt ucs`
+A* Search: `python main.py input.txt a_star`
+Greedy Best-First Search: `python main.py input.txt greedy_heuristic`
+
 **Note**: to run sample code: `python main.py input.txt`
