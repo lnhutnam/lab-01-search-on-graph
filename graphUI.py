@@ -6,7 +6,7 @@ from constant_variable import display_width, display_height, fps_speed, delay_st
 
 # constants
 from node_color import grey, black, white
-from search_algorithm import BFS, example_func, DFS, AStar, UCS
+from search_algorithm import BFS, GreedyHeuristic, example_func, DFS, AStar, UCS
 from utils import draw_graph, quit_event
 
 global_graph = None
@@ -66,6 +66,8 @@ def run(graph, start, goal, search_alg=None):
         AStar(global_graph, edges, edge_id, start, goal)
     # elif search_alg == 'other_algorithm':
     #     pass
+    elif search_alg == 'greedy_heuristic':
+        GreedyHeuristic(global_graph, edges, edge_id, start, goal)
     else:
         print("Pass a search algorithm to run program.")
         example_func(global_graph, edges, edge_id, start, goal)
