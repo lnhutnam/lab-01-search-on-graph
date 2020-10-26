@@ -197,7 +197,7 @@ def UCS(graph, edges, edge_id, start, goal):
     container = PriorityQueue()
     predecessor_set = set()
     # predecessor, cost, current node
-    container.put((-1, 0, start))
+    container.put((0, -1 , start))
 
     while container:
         pygame.event.get()
@@ -207,9 +207,7 @@ def UCS(graph, edges, edge_id, start, goal):
             graphUI.updateUI()
             break
 
-        predecessor, cost, current_node = container.get()
-        print(container.queue)
-        print(current_node)
+        cost, predecessor, current_node = container.get()
         if current_node not in explored:
             graph[current_node][3] = yellow
             graphUI.updateUI()
@@ -244,10 +242,10 @@ def UCS(graph, edges, edge_id, start, goal):
                     graph[neighbor][3] = red
                     edges[edge_id(current_node, neighbor)][1] = white
                     graphUI.updateUI()
-                    container.put((current_node, total_cost, neighbor))
+                    container.put((total_cost, current_node,  neighbor))
                 elif check:
                     container.get()
-                    container.put((current_node, total_cost, neighbor))
+                    container.put((total_cost, current_node, neighbor))
             graph[current_node][3] = blue
             graphUI.updateUI()
         
