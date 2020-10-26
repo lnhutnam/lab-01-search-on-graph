@@ -6,6 +6,7 @@ from node_color import white, yellow, black, red, blue, purple, orange, green, g
 
 import math
 from queue import PriorityQueue
+DFS_LIMIT = 40
 
 """
 Feel free print graph, edges to console to get more understand input.
@@ -45,6 +46,15 @@ def BFS(graph, edges, edge_id, start, goal):
         pygame.event.get()
         path = queue.pop(0)
         node = path[-1]
+        neighbors = graph[node][1]
+        if not queue or not neighbors:
+            graph[start][3] = orange
+            for i in range(len(path) - 1):
+                edges[edge_id(path[i], path[i + 1])][1] = green
+            graphUI.updateUI()
+            print(path)
+            print("There is no way to get the goal.")
+            return
         if node == goal:
             graph[start][3] = orange
             for i in range(len(path) - 1):
@@ -56,7 +66,7 @@ def BFS(graph, edges, edge_id, start, goal):
 
         graph[node][3] = yellow
         graphUI.updateUI()
-        for adjacency in graph[node][1]:
+        for adjacency in neighbors:
             if adjacency not in explored:
                 edges[edge_id(node, adjacency)][1] = white
                 graph[adjacency][3] = red
@@ -76,31 +86,39 @@ def BFS(graph, edges, edge_id, start, goal):
 
         graph[node][3] = blue
         graphUI.updateUI()
+    print("There is no way to reach the goal.")
 
 
-def find_path_dfs(graph, edges, edge_id, current, goal, visited):
+def find_path_dfs(graph, edges, edge_id, current, goal, visited, limit):
     if current == goal:
         graph[goal][3] = purple
         graphUI.updateUI()
         return [current]
 
+    if limit > DFS_LIMIT:
+        graph[goal][3] = purple
+        graphUI.updateUI()
+        return [current]
+    limit = limit + 1
     graph[current][3] = yellow
     graphUI.updateUI()
     for neighbor in graph[current][1]:
+        graph[neighbor][3] = red
+        edges[edge_id(current, neighbor)][1] = white
+        graphUI.updateUI()
         if neighbor not in visited:
-            graph[neighbor][3] = red
-            edges[edge_id(current, neighbor)][1] = white
-            graphUI.updateUI()
             visited.add(neighbor)
-
+            graph[neighbor][3] = blue
+            graphUI.updateUI()
             path = find_path_dfs(graph, edges, edge_id,
-                                 neighbor, goal, visited)
-
+                                 neighbor, goal, visited, limit)
             if path is not None:
                 path.insert(0, current)
                 return path
     graph[current][3] = blue
     graphUI.updateUI()
+
+
 
 
 def DFS(graph, edges, edge_id, start, goal):
@@ -130,7 +148,11 @@ def DFS(graph, edges, edge_id, start, goal):
         graph[goal][3] = purple
         graphUI.updateUI()
 
-    path = find_path_dfs(graph, edges, edge_id, start, goal, explored)
+    count = 0
+    path = find_path_dfs(graph, edges, edge_id, start, goal, explored, count)
+    if not path:
+        print("There is no way to reach the goal.")
+    print(path)
     graph[start][3] = orange
     for i in range(len(path) - 1):
         edges[edge_id(path[i], path[i + 1])][1] = green
@@ -180,9 +202,14 @@ def UCS(graph, edges, edge_id, start, goal):
     while container:
         pygame.event.get()
         if container.empty():
-            raise Exception("No way Exception")
-            return
+            graph[start][3] = orange
+            graph[goal][3] = purple
+            graphUI.updateUI()
+            break
+
         predecessor, cost, current_node = container.get()
+        print(container.queue)
+        print(current_node)
         if current_node not in explored:
             graph[current_node][3] = yellow
             graphUI.updateUI()
@@ -211,15 +238,20 @@ def UCS(graph, edges, edge_id, start, goal):
                 graphUI.updateUI()
                 return                 
             for neighbor in graph[current_node][1]:
-                if neighbor not in explored:
+                check = neighbor in container.queue
+                total_cost = cost + get_cost(graph[current_node][0], graph[neighbor][0])
+                if neighbor not in explored or not check:
                     graph[neighbor][3] = red
                     edges[edge_id(current_node, neighbor)][1] = white
                     graphUI.updateUI()
-                total_cost = cost + get_cost(graph[current_node][0], graph[neighbor][0])
-                container.put((current_node, total_cost, neighbor))
+                    container.put((current_node, total_cost, neighbor))
+                elif check:
+                    container.get()
+                    container.put((current_node, total_cost, neighbor))
             graph[current_node][3] = blue
             graphUI.updateUI()
         
+    print("There is no way to reach the goal.")
 # Heuristic function
 # Euclidean Heuristic Distance:
 def euclidean_distance(current_x, current_y, goal_x, goal_y):
@@ -306,9 +338,10 @@ def AStar(graph, edges, edge_id, start, goal):
         current_cost, current_node, current_path = pop_frontier_cost(open_set)
         graph[current_node][3] = yellow
         graphUI.updateUI()
+        explored_set.append(current_node) 
         # g function
         # current_cost = current_cost - euclidean_distance(graph[current_node][0][0], graph[current_node][0][1], graph[start][0][0], graph[start][0][1])
-        current_cost = current_cost - manhattan_distance(graph[current_node][0][0], graph[current_node][0][1], graph[start][0][0], graph[start][0][1])
+        current_cost = current_cost - manhattan_distance(graph[current_node][0][0], graph[current_node][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
         # current_cost = current_cost - diagonal_distance(graph[current_node][0][0], graph[current_node][0][1], graph[start][0][0], graph[start][0][1])
         if current_node == goal:
             print(current_path)
@@ -322,29 +355,31 @@ def AStar(graph, edges, edge_id, start, goal):
         neighbors  = graph[current_node][1]
 
         for neighbor in neighbors:
-            graph[neighbor][3] = red
-            edges[edge_id(current_node, neighbor)][1] = white
-            graphUI.updateUI()
             pos,check,old_node,old_cost = in_frontier_Cost(open_set, neighbor)
             if neighbor not in explored_set  and not check:
+                graph[neighbor][3] = red
+                edges[edge_id(current_node, neighbor)][1] = white
+                graphUI.updateUI()
                 new_path = list(current_path)
                 new_path.append(neighbor)
                 # f = g + h
                 # new_cost = current_cost + euclidean_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
-                new_cost = current_cost + manhattan_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
+                new_cost = current_cost + manhattan_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
                 # new_cost = current_cost + diagonal_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
                 open_set.append((new_cost,int(neighbor),new_path))
             elif check:
                 # new_cost = current_cost + euclidean_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
-                new_cost = current_cost + manhattan_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
+                new_cost = current_cost + manhattan_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
                 # new_cost = current_cost + diagonal_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
                 new_path = list(current_path)
                 new_path.append(neighbor)
                 if(old_cost > new_cost):
                     open_set.pop(pos)
-                    open_set.append((new_cost,int(neighbor),new_path))     
+                    open_set.append((new_cost,int(neighbor),new_path))    
+
         graph[current_node][3] = blue
-        graphUI.updateUI()                    
+        graphUI.updateUI()    
+    print("There is no way to reach the goal.")               
 
 def GreedyHeuristic(graph, edges, edge_id, start, goal):
     """
@@ -432,6 +467,7 @@ def GreedyHeuristic(graph, edges, edge_id, start, goal):
                     open_set.append((new_cost,int(neighbor),new_path)) 
                     graph[neighbor][3] = blue
                     graphUI.updateUI()
+    print("There is no way to reach the goal.")
 
 def example_func(graph, edges, edge_id, start, goal):
     """
@@ -461,6 +497,8 @@ def example_func(graph, edges, edge_id, start, goal):
     @param goal: int - vertices/node to search
     @return:
     """
+    print(graph)
+    return 
     # Ex1: Set all edge from Node 1 to Adjacency node of Node 1 is green edges.
     node_1 = graph[1]
     for adjacency_node in node_1[1]:
