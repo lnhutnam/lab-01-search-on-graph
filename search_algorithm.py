@@ -47,7 +47,7 @@ def BFS(graph, edges, edge_id, start, goal):
         path = queue.pop(0)
         node = path[-1]
         neighbors = graph[node][1]
-        if not queue or not neighbors:
+        if not queue and not neighbors:
             graph[start][3] = orange
             for i in range(len(path) - 1):
                 edges[edge_id(path[i], path[i + 1])][1] = green
@@ -117,8 +117,6 @@ def find_path_dfs(graph, edges, edge_id, current, goal, visited, limit):
                 return path
     graph[current][3] = blue
     graphUI.updateUI()
-
-
 
 
 def DFS(graph, edges, edge_id, start, goal):
