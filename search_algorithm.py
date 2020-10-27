@@ -339,7 +339,7 @@ def AStar(graph, edges, edge_id, start, goal):
         explored_set.append(current_node) 
         # g function
         # current_cost = current_cost - euclidean_distance(graph[current_node][0][0], graph[current_node][0][1], graph[start][0][0], graph[start][0][1])
-        current_cost = current_cost - manhattan_distance(graph[current_node][0][0], graph[current_node][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
+        current_cost = current_cost - manhattan_distance(graph[current_node][0][0], graph[current_node][0][1], graph[goal][0][0], graph[goal][0][1])
         # current_cost = current_cost - diagonal_distance(graph[current_node][0][0], graph[current_node][0][1], graph[start][0][0], graph[start][0][1])
         if current_node == goal:
             print(current_path)
