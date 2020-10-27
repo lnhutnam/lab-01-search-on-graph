@@ -301,7 +301,9 @@ def AStar(graph, edges, edge_id, start, goal):
                 return i, True, temp, cost
         return None, False, None, None
 
-    if start or goal not in range(len(graph)):
+    if (start or goal) not in range(len(graph) + 1):
+        print(len(graph))
+        print(start)
         print("Error: Input invaild range.")
         return
 
@@ -400,7 +402,7 @@ def GreedyHeuristic(graph, edges, edge_id, start, goal):
                 return i, True, temp, cost
         return None, False, None, None
 
-    if start or goal not in range(len(graph)):
+    if (start or goal) not in range(len(graph)):
         print("Error: Input invaild range.")
         return
 
