@@ -158,15 +158,15 @@ Nghiên cứu, cài đặt và trình bày các thuật toán tìm kiếm trên 
 \ra{1.3}
 \begin{tabular}{lllll}\toprule
 \textbf{STT} & \textbf{Tiêu chí} & \textbf{Mức độ} & \textbf{Điểm} & \textbf{Ghi chú} \\\midrule
-1 & Trình bày thuật toán BFS & 100\% & 0 & \\
-2 & Trình bày thuật toán DFS & 100\% & 0 & \\
-3 & Trình bày thuật toán UCS & 100\% & 0 & \\
-4 & Trình bày thuật giải A* & 100\% & 0 & \\
-5 & Trình bày các sinh trọng số để chạy UCS và A* & 100\% & 0 & \\
-6 & Trình thuật toán Greedy Best-First Search & 100\% & 0 & Điểm cộng\\
-7 & Trình bày điểm khác biệt giữa UCS và A* & 100\% & 0 & \\
-8 & Chạy thử và có video demo (Ít nhất 3 testcase) cho mỗi thuật toán & 100\% & 0 & \\
-9 & Có trình bày báo cáo & 100\% & 0 & \\
+1 & Trình bày thuật toán BFS & 100\% & 10 & \\
+2 & Trình bày thuật toán DFS & 100\% & 10 & \\
+3 & Trình bày thuật toán UCS & 100\% & 10 & \\
+4 & Trình bày thuật giải A* & 100\% & 10 & \\
+5 & Trình bày các sinh trọng số để chạy UCS và A* & 100\% & 10 & \\
+6 & Trình thuật toán Greedy Best-First Search & 100\% & 10 & Điểm cộng\\
+7 & Trình bày điểm khác biệt giữa UCS và A* & 100\% & 10 & \\
+8 & Chạy thử và có video demo (Ít nhất 3 testcase) cho mỗi thuật toán & 100\% & 10 & \\
+9 & Có trình bày báo cáo & 100\% & 10 & \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -295,7 +295,8 @@ Trong bài lab này, sử dụng module queue với class PriorityQueue của Py
 
 \subsubsection{Hàm chi phí - Cost Function}
 Ta có hàm tính chi phí:\\
-f(n) = tổng chi phí đường đi từ nút start đến nút n
+f(n) = tổng chi phí đường đi từ nút start đến nút n\\
+Đối với lab, khoảng cách Euclidean cho ta khoảng cách ngắn nhất trong các loại khoảng cách giữa hai điểm trong toán học nên sẽ dùng khoảng cách này để tính trọng số giữa 2 đỉnh trong đồ thị
 
 \subsubsection{Ý tưởng}
 
@@ -470,7 +471,7 @@ Với đồ thị vô hạn, hệ số phân nhánh của mỗi nút hữu hạn
 \paragraph{Độ phức tạp về thời gian}
 Độ phức tạp về thời gian của A* phụ thuộc vào cách chọn hàm Heuristic hay chính là h(n). Hàm Heuristic tốt và tối ưu thì thuật toán đạt hiệu năng cao.Trong trường hợp xấu nhất của không gian tìm kiếm không bị giới hạn, số lượng nút được mở rộng là cấp số nhân theo chiều sâu d của lời giải (đường đi ngắn nhất): $O(b^{d})$, trong đó b là hệ số phân nhánh
 \paragraph{Độ phức tạp về không gian}
-Độ phức tạp về không gian của A* gần giống như các thuật toán khác vì tất cả mọi thứ như đường đi, chi phí cần được lưu trữ. 
+Độ phức tạp về không gian của A* gần giống như các thuật toán khác, vì tất cả mọi thứ như đường đi, chi phí cần được lưu trữ, và việc tính toán các hàm heuristic cũng phức tạp, nên sẽ rất tốn bộ nhớ.
 \subsection{Tìm kiếm tối ưu kiểu tham lam - Greedy Best First Search}
 
 \subsubsection{Ý tưởng}
@@ -487,7 +488,7 @@ Vì đánh giá dựa vào hàm Heuristic nên ta sẽ tìm được lời giả
 \paragraph{Độ phức tạp về thời gian}
 Khi hàm đánh giá chính là hàm Heuristic, nó phụ thuộc vào cách chọn hàm Heuristic hay chính là h(n). Hàm Heuristic tốt và tối ưu thì thuật toán đạt hiệu năng cao, và nó sẽ gần giống với BFS
 \paragraph{Độ phức tạp về không gian}
-
+Khá tương tự với độ phức tạp về không gian của thuật giải A*.
 \newpage
 
 \section{Hai thuật toán UCS và $A^{*}$}
@@ -586,28 +587,6 @@ Bảng so so sánh sự khác biệt giữa hai thuật toán
 \centering
 \includegraphics[width=0.98\textwidth]{Test_Case_04_Content.png}
 \caption{Testcase 04 - Kích thước 20 đỉnh - Test hình dạng đồ thị}
-\end{figure}
-\subsubsection{Test case 05:}
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.5\textwidth]{Test_Case_05.png}
-\caption{Testcase 05}
-\end{figure}
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.98\textwidth]{Test_Case_06_Content.png}
-\caption{Testcase 05 - Kích thước 20 đỉnh - Test hình dạng đồ thị}
-\end{figure}
-\subsubsection{Test case 06:}
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.5\textwidth]{Test_Case_06.png}
-\caption{Testcase 06}
-\end{figure}
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.98\textwidth]{Test_Case_06_Content.png}
-\caption{Testcase 06 - Kích thước 20 đỉnh - Test hình dạng đồ thị}
 \end{figure}
 
 Các video kiểm thử với từng thuật toán BFS, DFS, UCS, A Star, Greedy Best-First Search chứa trong thư mục video của đồ án
