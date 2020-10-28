@@ -21,10 +21,12 @@ def BFS(graph, edges, edge_id, start, goal):
     """
     # TODO: your code
     print("Implement BFS algorithm.")
+    # Nếu tham số start và goal không tồn tại, tức là out range len(graph)
     if start not in range(0, len(graph)) or goal not in range(0, len(graph)):
         print("Error: Input invaild range.")
         return
 
+    # Tô màu lại toàn bộ bản đồ đồ là màu đen
     for i in range(len(graph)):
         graph[i][3] = black
     graphUI.updateUI()
@@ -36,14 +38,16 @@ def BFS(graph, edges, edge_id, start, goal):
     queue = [[start]]
     explored.add(start)
 
+    # Nếu trạng thái start trùng với trạng thái goal, tô màu tím (purple)
     if start == goal:
-        print("Algorithm finished - your path is: {} -> {}".format(start, goal))
+        print("Algorithm finished - your path is: {}".format(start))
         # Set color yellow for the goal node
         graph[goal][3] = purple
         graphUI.updateUI()
 
+    # Trong khi hàm đợi chưa rỗng
     while queue:
-        pygame.event.get()
+        pygame.event.get() # Dòng này đặt sau while để tránh việc not responding của frame PyGame
         path = queue.pop(0)
         node = path[-1]
         neighbors = graph[node][1]
@@ -136,10 +140,6 @@ def DFS(graph, edges, edge_id, start, goal):
     # keep track of explored nodes
     explored = set()
     explored.add(start)
-    # Set color orange for start node
-    graph[start][3] = orange
-    graphUI.updateUI()
-
     if start == goal:
         print("Algorithm finished - your path is: {} -> {}".format(start, goal))
         # Set color yellow for the goal node
@@ -179,10 +179,9 @@ def UCS(graph, edges, edge_id, start, goal):
         return
 
     if start == goal:
-        print("Algorithm finished - your path is: {} -> {}".format(start, goal))
-        graph[start][3] = orange
+        print("Algorithm finished - your path is: {}".format(goal))
         graph[goal][3] = purple
-        edges[edge_id(start, goal)][1] = green
+        graphUI.updateUI()
         return
 
     print(graph)
@@ -192,6 +191,7 @@ def UCS(graph, edges, edge_id, start, goal):
 
     # keep track of explored nodes
     explored = set()
+    # containter is priority queue
     container = PriorityQueue()
     predecessor_set = set()
     # predecessor, cost, current node
@@ -212,12 +212,9 @@ def UCS(graph, edges, edge_id, start, goal):
             predecessor_set.add((predecessor, current_node))
             explored.add(current_node)
             if current_node == goal:
-                print(predecessor)
-                print(current_node)
-                print(cost)
                 path = [current_node]
-                print(path)
                 print(predecessor_set)
+                # Trace path
                 while True:
                     for item in predecessor_set:
                         if item[1] == current_node:
@@ -226,13 +223,14 @@ def UCS(graph, edges, edge_id, start, goal):
                     current_node = predecessor
                     if current_node == start:
                         break
+                print("Algorithm finshed, your path is:")
                 print(path)
                 graph[start][3] = orange
                 graph[goal][3] = purple
                 for i in range(len(path) - 1):
                     edges[edge_id(path[i], path[i + 1])][1] = green
                 graphUI.updateUI()
-                return                 
+                return   # End algorithm        
             for neighbor in graph[current_node][1]:
                 check = neighbor in container.queue
                 total_cost = cost + get_cost(graph[current_node][0], graph[neighbor][0])
@@ -248,6 +246,8 @@ def UCS(graph, edges, edge_id, start, goal):
             graphUI.updateUI()
         
     print("There is no way to reach the goal.")
+
+    
 # Heuristic function
 # Euclidean Heuristic Distance:
 def euclidean_distance(current_x, current_y, goal_x, goal_y):
@@ -276,9 +276,6 @@ def diagonal_distance(current_x, current_y, goal_x, goal_y):
     goal_node(goal_x, goal_y)
     """
     return max(abs(current_x - goal_x),  abs(current_y - goal_y))
-
-def h_function(graph, current_node, goal):
-    return euclidean_distance(graph[current_node][0][0], graph[current_node][0][1], graph[goal][0][0], graph[goal][0][1])
 
 def AStar(graph, edges, edge_id, start, goal):
     """
@@ -317,8 +314,6 @@ def AStar(graph, edges, edge_id, start, goal):
     for i in range(len(graph)):
         graph[i][3] = black
     graphUI.updateUI()
-
-    print(graph)
     # Create a open set
     open_set = []
     # Create a explored set
@@ -337,9 +332,11 @@ def AStar(graph, edges, edge_id, start, goal):
         graph[current_node][3] = yellow
         graphUI.updateUI()
         explored_set.append(current_node) 
-        # g function
+        # Vì trên map ban đầu không có thông tin heuristic sẵn nên ta phải tính như thế, nó chỉ tương đối
+        # Nếu ta có một ma trận heuristic sẵn thì hàm g ta sẽ tính chính xác hơn
+        # g function = current cost - ước lượng bằng manhattan distance từ current node đến goal
         # current_cost = current_cost - euclidean_distance(graph[current_node][0][0], graph[current_node][0][1], graph[start][0][0], graph[start][0][1])
-        current_cost = current_cost - manhattan_distance(graph[current_node][0][0], graph[current_node][0][1], graph[goal][0][0], graph[goal][0][1])
+        current_cost = current_cost - manhattan_distance(graph[current_node][0][0], graph[current_node][0][1], graph[goal][0][0], graph[goal][0][1]) 
         # current_cost = current_cost - diagonal_distance(graph[current_node][0][0], graph[current_node][0][1], graph[start][0][0], graph[start][0][1])
         if current_node == goal:
             print(current_path)
@@ -360,15 +357,15 @@ def AStar(graph, edges, edge_id, start, goal):
                 graphUI.updateUI()
                 new_path = list(current_path)
                 new_path.append(neighbor)
-                # f = g + h
-                # new_cost = current_cost + euclidean_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
+                # f = g + h = g + ước lượng manhattan distance từ neighbor node đến goal
+                # new_cost = current_cost + euclidean_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
                 new_cost = current_cost + manhattan_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
-                # new_cost = current_cost + diagonal_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
+                # new_cost = current_cost + diagonal_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
                 open_set.append((new_cost,int(neighbor),new_path))
             elif check:
-                # new_cost = current_cost + euclidean_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
+                # new_cost = current_cost + euclidean_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
                 new_cost = current_cost + manhattan_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
-                # new_cost = current_cost + diagonal_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
+                # new_cost = current_cost + diagonal_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1]) + 1
                 new_path = list(current_path)
                 new_path.append(neighbor)
                 if(old_cost > new_cost):
@@ -408,16 +405,15 @@ def GreedyHeuristic(graph, edges, edge_id, start, goal):
 
     if start == goal:
         print("Algorithm finished - your path is: {} -> {}".format(start, goal))
-        graph[start][3] = orange
-        graph[goal][3] = purple
-        edges[edge_id(start, goal)][1] = green
+        graph[start][3] = purple
+        graphUI.updateUI()
         return
 
+    # Tô lại toàn bô các đỉnh màu đen
     for i in range(len(graph)):
         graph[i][3] = black
     graphUI.updateUI()
 
-    print(graph)
     # Create a open set
     open_set = []
     # Create a explored set
@@ -435,7 +431,9 @@ def GreedyHeuristic(graph, edges, edge_id, start, goal):
         graph[current_node][3] = yellow
         graphUI.updateUI()
         if current_node == goal:
+            print("Your path is: ")
             print(current_path)
+            print("Explored vertex set: ")
             print(explored_set)
             graph[start][3] = orange
             graph[goal][3] = purple
@@ -453,16 +451,17 @@ def GreedyHeuristic(graph, edges, edge_id, start, goal):
             new_path.append(neighbor)
             # f = h
             # new_cost = current_cost + euclidean_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
+            # Hàm f trung với hàm h nên giờ chỉ cần tính ước lượng manhattan từ neighbor đến goal thôi
             new_cost = current_cost + manhattan_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
             # new_cost = current_cost + diagonal_distance(graph[neighbor][0][0], graph[neighbor][0][1], graph[goal][0][0], graph[goal][0][1])
             if neighbor not in explored_set  and not check:
-                open_set.append((new_cost, neighbor,new_path))
+                open_set.append((new_cost, neighbor, new_path))
                 graph[neighbor][3] = blue
                 graphUI.updateUI()
             elif check:
                 if(old_cost > new_cost):
                     open_set.pop(pos)
-                    open_set.append((new_cost,int(neighbor),new_path)) 
+                    open_set.append((new_cost, int(neighbor), new_path)) 
                     graph[neighbor][3] = blue
                     graphUI.updateUI()
     print("There is no way to reach the goal.")
@@ -495,8 +494,6 @@ def example_func(graph, edges, edge_id, start, goal):
     @param goal: int - vertices/node to search
     @return:
     """
-    print(graph)
-    return 
     # Ex1: Set all edge from Node 1 to Adjacency node of Node 1 is green edges.
     node_1 = graph[1]
     for adjacency_node in node_1[1]:
